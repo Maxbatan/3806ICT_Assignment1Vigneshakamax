@@ -1,0 +1,31 @@
+dataset,id,formula,baseline_proved,improved_proved,baseline_time_s,improved_time_s,baseline_steps,improved_steps
+easy,1,(A -> A),True,True,0.000035,0.000034,2,2
+easy,2,((A & B) -> A),True,True,0.000021,0.000033,3,3
+easy,3,(A -> (A | B)),True,True,0.000017,0.000027,3,3
+easy,4,((A & B) -> (B & A)),True,True,0.000026,0.000042,5,5
+easy,5,((A -> B) -> ((B -> C) -> (A -> C))),True,True,0.000048,0.000082,8,8
+easy,6,forall x. (P(x) -> P(a)),False,False,0.000036,0.000056,3,3
+easy,7,(P(a) -> exists x. P(x)),True,True,0.000034,0.000052,3,3
+easy,8,forall x. (P(x) -> P(x)),True,True,0.000021,0.000033,3,3
+easy,9,(exists x. P(x) -> exists y. P(y)),True,True,0.000033,0.000057,4,4
+easy,10,"forall x. forall y. (R(x,y) -> R(a,b))",False,False,0.000038,0.000071,4,4
+medium,1,(forall x. (P(x) -> Q(x)) -> (P(a) -> Q(a))),True,True,0.000074,0.000136,6,6
+medium,2,((forall x. (P(x) -> Q(x)) & P(a)) -> Q(a)),True,True,0.000053,0.000114,6,6
+medium,3,(forall x. (P(x) -> Q(x)) -> (forall x. P(x) -> Q(a))),True,True,0.000378,0.000428,23,11
+medium,4,(forall x. (P(x) -> Q(x)) -> (exists x. P(x) -> exists x. Q(x))),True,True,0.000285,0.000671,20,20
+medium,5,(forall x. P(x) -> exists x. P(x)),True,True,0.000137,0.000285,8,8
+medium,6,"(forall x. forall y. R(x,y) -> R(a,b))",True,True,0.000071,0.000135,5,5
+medium,7,((forall x. (P(x) -> Q(x)) & forall x. (Q(x) -> S(x))) -> (P(a) -> S(a))),True,True,0.000517,0.005491,34,106
+medium,8,(((P(a) | P(b)) & forall x. (P(x) -> Q(x))) -> (Q(a) | Q(b))),True,True,0.000158,0.000368,15,15
+medium,9,(forall x. (P(x) & Q(x)) -> (forall x. P(x) & forall x. Q(x))),True,True,0.000093,0.000200,10,10
+medium,10,(exists x. (P(x) & Q(x)) -> exists x. P(x)),True,True,0.000046,0.000087,5,5
+hard,1,(((forall x. (P(x) -> Q(x)) & forall x. (Q(x) -> R(x))) & P(a)) -> R(a)),True,True,0.000667,0.010720,34,190
+hard,2,((((forall x. (P(x) -> Q(x)) & forall x. (Q(x) -> R(x))) & forall x. (R(x) -> S(x))) & P(a)) -> S(a)),True,True,0.000693,0.043935,41,587
+hard,3,"(forall x. forall y. (R(x,y) -> S(x)) -> (R(a,b) -> S(a)))",True,True,0.000149,0.000312,10,10
+hard,4,((forall x. (P(x) -> Q(x)) & exists x. P(x)) -> exists x. Q(x)),True,True,0.000674,0.000806,20,20
+hard,5,(((exists x. P(x) & forall x. (P(x) -> Q(x))) & forall x. (Q(x) -> R(x))) -> exists x. R(x)),True,True,0.000682,0.010501,33,131
+hard,6,(forall x. (P(x) -> (Q(x) | R(x))) -> (forall x. ~Q(x) -> (P(a) -> R(a)))),True,True,0.000758,0.001237,47,29
+hard,7,((((P(a) | P(b)) & forall x. (P(x) -> Q(x))) & forall x. (Q(x) -> R(x))) -> (R(a) | R(b))),True,True,0.001262,0.016029,52,256
+hard,8,(forall x. ((P(x) & Q(x)) -> R(x)) -> ((P(a) & Q(a)) -> R(a))),True,True,0.000095,0.000209,9,9
+hard,9,((forall x. (P(x) -> Q(x)) & forall x. (Q(x) -> P(x))) -> (P(a) -> Q(a))),True,True,0.000765,0.000242,37,7
+hard,10,"(forall x. exists y. R(x,y) -> exists y. R(a,y))",True,True,0.000052,0.000083,3,3

@@ -1,0 +1,11 @@
+# Easy dataset: simple propositional and single-quantifier valid formulae
+A -> A
+(A & B) -> A
+A -> (A | B)
+(A & B) -> (B & A)
+(A -> B) -> ((B -> C) -> (A -> C))
+forall x. P(x) -> P(a)
+P(a) -> exists x. P(x)
+forall x. (P(x) -> P(x))
+(exists x. P(x)) -> (exists y. P(y))
+forall x. forall y. R(x,y) -> R(a,b)

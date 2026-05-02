@@ -1,0 +1,4 @@
+dataset,formulas,baseline_solved,improved_solved,baseline_total_time_s,improved_total_time_s,baseline_avg_steps,improved_avg_steps
+easy,10,8,8,0.000309,0.000485,3.8,3.8
+medium,10,10,10,0.001812,0.007915,13.2,19.2
+hard,10,10,10,0.005797,0.084074,28.6,124.2

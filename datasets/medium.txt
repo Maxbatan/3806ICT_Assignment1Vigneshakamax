@@ -1,0 +1,11 @@
+# Medium dataset: formulas requiring quantifier use and branching
+(forall x. (P(x) -> Q(x))) -> (P(a) -> Q(a))
+((forall x. (P(x) -> Q(x))) & P(a)) -> Q(a)
+(forall x. (P(x) -> Q(x))) -> ((forall x. P(x)) -> Q(a))
+(forall x. (P(x) -> Q(x))) -> ((exists x. P(x)) -> (exists x. Q(x)))
+(forall x. P(x)) -> (exists x. P(x))
+(forall x. forall y. R(x,y)) -> R(a,b)
+((forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> S(x)))) -> (P(a) -> S(a))
+((P(a) | P(b)) & (forall x. (P(x) -> Q(x)))) -> (Q(a) | Q(b))
+(forall x. (P(x) & Q(x))) -> ((forall x. P(x)) & (forall x. Q(x)))
+(exists x. (P(x) & Q(x))) -> (exists x. P(x))

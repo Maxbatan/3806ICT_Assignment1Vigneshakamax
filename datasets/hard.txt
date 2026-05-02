@@ -1,0 +1,11 @@
+# Hard dataset: nested quantifiers, implication chains and branching
+((forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> R(x))) & P(a)) -> R(a)
+((forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> R(x))) & (forall x. (R(x) -> S(x))) & P(a)) -> S(a)
+(forall x. forall y. (R(x,y) -> S(x))) -> (R(a,b) -> S(a))
+((forall x. (P(x) -> Q(x))) & (exists x. P(x))) -> (exists x. Q(x))
+((exists x. P(x)) & (forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> R(x)))) -> (exists x. R(x))
+(forall x. (P(x) -> (Q(x) | R(x)))) -> ((forall x. ~Q(x)) -> (P(a) -> R(a)))
+((P(a) | P(b)) & (forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> R(x)))) -> (R(a) | R(b))
+(forall x. ((P(x) & Q(x)) -> R(x))) -> ((P(a) & Q(a)) -> R(a))
+((forall x. (P(x) -> Q(x))) & (forall x. (Q(x) -> P(x)))) -> (P(a) -> Q(a))
+(forall x. exists y. R(x,y)) -> exists y. R(a,y)

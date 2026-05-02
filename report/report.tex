@@ -1,0 +1,174 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{Improving Automated Proof Search for First-Order Logic}
+\titlerunning{Improving FOL Proof Search}
+
+\author{Vignesh Kumar}
+\authorrunning{V. Kumar}
+\institute{Griffith University, Gold Coast, Australia\\
+\email{S5397466}}
+
+\maketitle
+
+\begin{abstract}
+This project investigates automated reasoning for first-order logic using a backward sequent-calculus proof-search method. The assignment goal was to implement the textbook proof-search procedure and then improve its performance on benchmark formulae. The system developed in this project reads formulae from text files, parses each formula into an abstract syntax tree, converts the target formula into an initial sequent, and then attempts to prove it using a baseline solver based on Algorithm 2 from the course textbook. The baseline solver applies sequent-calculus rules backwards, closing branches using identity and other closing rules, decomposing non-branching connectives first, and then exploring branching and quantifier rules. An improved solver was also implemented by adding repeated-state caching, deterministic rule ordering, and coordinated quantifier instantiation. These changes are designed to reduce repeated exploration and choose useful terms earlier when handling quantified formulae. The system was tested on three generated datasets: easy, medium, and hard. The results show that both solvers handled simple formulae well, while the improved solver was more useful on difficult formulae involving nested quantifiers and implication chains. The project shows that even small proof-search optimisations can improve the practical behaviour of a first-order reasoning system, although the method is still limited by depth bounds and the undecidability of first-order validity.
+\keywords{Automated reasoning \and First-order logic \and Sequent calculus \and Proof search}
+\end{abstract}
+
+\section{Introduction}
+
+Automated reasoning studies how computers can check logical arguments and prove formulae automatically. It is important in formal verification, artificial intelligence, program analysis, and security because many correctness problems can be represented as logical proof tasks. First-order logic is especially useful because it can describe objects, predicates, and quantified statements such as ``all objects have a property'' or ``there exists an object with a property''.
+
+The course textbook presents sequent calculus as a formal proof system for first-order logic. A sequent has the form $\Gamma \vdash \Delta$, where $\Gamma$ is the set of formulae on the left side and $\Delta$ is the set of formulae on the right side. In backward proof search, the system starts from the formula that needs to be proved and repeatedly applies inference rules backwards until all branches close or until no rule can be applied. This project implements that idea as a small automated theorem prover.
+
+The main contribution of this project is a working proof-search pipeline for first-order logic formulae. The baseline solver follows Algorithm 2 from Hou's textbook~\cite{hou2021}. The improved solver extends the baseline with repeated-state caching and quantifier-term ordering. The implementation is tested on several generated datasets to compare how many formulae each method can prove and how much time each method takes.
+
+\section{Background and Related Work}
+
+The textbook explains that proof search is the process of finding a derivation in a proof calculus. In sequent calculus, rules are applied to transform a target sequent into simpler sequents. If every branch can be closed, then the original formula is valid. The identity rule closes a branch when the same formula appears on both sides of the sequent.
+
+For propositional logic, backward proof search can be systematic because each logical rule breaks a formula into smaller subformulae. First-order logic is harder because quantifier rules can generate new terms and may be applied many times. In Algorithm 2, the problematic rules are $\forall L$ and $\exists R$, because they keep the quantified formula in the premise and may therefore be applied repeatedly. This means first-order proof search is a semi-decision procedure: it can find proofs for many valid formulae, but it may not terminate for every input.
+
+Modern theorem provers use many more advanced techniques, such as indexing, unification, resolution, tableaux, and sophisticated heuristics. This project does not wrap an existing solver. Instead, it implements the textbook-style sequent-calculus search directly and then adds small optimisations to that implementation.
+
+\section{Proposed Approach}
+
+\subsection{System Workflow}
+
+Figure~\ref{fig:workflow} shows the overall pipeline used in the project. Each formula is stored as one line in a dataset file. The parser converts the formula string into an abstract syntax tree. The solver then builds the initial sequent $\vdash A$, where $A$ is the target formula, and runs both the baseline and improved proof-search methods.
+
+\begin{figure}[t]
+\centering
+\fbox{%
+\begin{minipage}{0.9\linewidth}
+\centering
+Input text formulae\\
+$\downarrow$\\
+Parser and tokeniser\\
+$\downarrow$\\
+Abstract syntax tree representation\\
+$\downarrow$\\
+Initial sequent $\vdash A$\\
+$\downarrow$\\
+\begin{tabular}{cc}
+Baseline solver & Improved solver\\
+Algorithm 2 & Algorithm 2 + caching + term ordering
+\end{tabular}\\
+$\downarrow$\\
+Proved / not proved, runtime, and step count
+\end{minipage}}
+\caption{Workflow of the automated reasoning system.}
+\label{fig:workflow}
+\end{figure}
+
+\subsection{Formula Representation and Parser}
+
+The implementation uses a simple abstract syntax tree for first-order logic. Terms are represented as either variables or constants. Formulae are represented using predicate atoms, truth, falsity, negation, conjunction, disjunction, implication, universal quantification, and existential quantification.
+
+The parser supports the syntax used in the dataset files. For example, the formula
+\begin{verbatim}
+(forall x. (P(x) -> Q(x))) -> (P(a) -> Q(a))
+\end{verbatim}
+is parsed into an implication whose left side is a universally quantified formula and whose right side is another implication. This parser satisfies the requirement that formulae are read from text files rather than being manually hard-coded into the solver.
+
+\subsection{Baseline Solver Based on Algorithm 2}
+
+The baseline solver follows the structure of Algorithm 2. To prove a formula $A$, it first builds the bottom sequent $\vdash A$. For each open branch, the solver checks whether a closing rule is applicable. A branch closes if the same formula appears on the left and right side of the sequent, if $\bot$ appears on the left, or if $\top$ appears on the right.
+
+If the branch is not closed, the solver applies non-branching rules first. These include rules such as $\land L$, $\lor R$, $\rightarrow R$, $\neg L$, $\neg R$, $\forall R$, and $\exists L$. After that, it applies branching rules such as $\land R$, $\lor L$, and $\rightarrow L$. Finally, the solver applies the copying quantifier rules $\forall L$ and $\exists R$. When an existing term is available and has not yet been used for that quantified formula, the solver instantiates the quantified variable using that term. If no such term exists, the solver creates a fresh constant.
+
+The baseline is intentionally naive. It follows the rule order from the textbook and uses only a fixed search depth and step limit to avoid infinite search.
+
+\subsection{Improved Solver}
+
+The improved solver keeps the same logical rules as the baseline but changes the search strategy. Three improvements were added.
+
+First, repeated-state caching records previously explored sequents together with their quantifier-instantiation history. If the same proof state is reached again, the solver avoids repeating the same search path. This is expected to reduce unnecessary recomputation.
+
+Second, deterministic rule ordering processes smaller formulae first. The hypothesis is that simple decompositions often expose atoms earlier, allowing the identity rule to close branches sooner.
+
+Third, coordinated quantifier instantiation prioritises terms already appearing on the opposite side of the sequent. For example, if the solver has $\forall x.(P(x) \rightarrow Q(x))$ on the left and needs to prove $Q(a)$ on the right, using the term $a$ early is more useful than creating an unrelated fresh term. This is expected to help formulae with quantified implication chains.
+
+\section{Datasets}
+
+Three generated datasets were used. The easy dataset contains simple propositional formulae and single-quantifier formulae. The medium dataset contains formulae where universal or existential formulae must interact with implication. The hard dataset contains nested quantifiers, longer implication chains, and branching formulae. The datasets are suitable because they test different proof-search behaviours: simple identity closure, propositional branching, quantifier instantiation, and repeated reasoning across implication chains.
+
+Some formulae are intentionally not provable by the solver or are difficult under the search limits. This is useful because it tests not only whether the solver can close easy branches, but also how it behaves when the proof search space becomes larger.
+
+\section{Implementation and Experiment}
+
+\subsection{Implementation Details}
+
+The system was implemented in Python 3 using only the standard library. The implementation is divided into four main files. The file \texttt{logic.py} defines terms, formulae, substitution, and sequents. The file \texttt{parser.py} reads formulae from text files and converts them into abstract syntax trees. The file \texttt{solver.py} contains both the baseline and improved solvers. The file \texttt{run\_experiments.py} runs the evaluation and writes CSV result files.
+
+The solver does not use any external theorem prover. All proof-search rules are implemented directly. Each run records whether the formula was proved, the runtime, and the number of recursive proof-search steps.
+
+\subsection{Experiment Setup}
+
+The experiment was run by executing \texttt{python run\_experiments.py}. Each dataset file was read from the \texttt{datasets} folder. Every formula was tested once with the baseline solver and once with the improved solver. Runtime was measured using Python's \texttt{time.perf\_counter()} function.
+
+Replace this sentence with your exact machine details before submission: the experiment was run on Windows 11 using Python 3 on a laptop/desktop with \texttt{[CPU]} and \texttt{[RAM]}.
+
+\subsection{Results}
+
+Table~\ref{tab:results} gives the summary results from the experiment. The time values are total runtime for each dataset.
+
+\begin{table}[t]
+\centering
+\caption{Baseline and improved solver results.}
+\label{tab:results}
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & Formulae & Base solved & Imp. solved & Base time & Imp. time & Base avg steps\\
+\midrule
+Easy & 10 & 8 & 8 & 0.000709 & 0.000862 & 3.8\\
+Medium & 10 & 10 & 10 & 0.003533 & 0.008616 & 13.2\\
+Hard & 10 & 9 & 10 & 0.096829 & 0.162230 & 56.1\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The easy dataset was handled well by both solvers. This is expected because most formulae in the easy dataset require only identity closure and simple propositional decomposition. The medium dataset was also solved successfully by both solvers, although the improved solver took slightly longer because it performs extra caching and ordering checks.
+
+The hard dataset shows the main benefit of the improved method. The baseline solver proved 9 out of 10 formulae, while the improved solver proved 10 out of 10. The improved solver had a higher runtime on this small benchmark because caching and quantifier coordination add overhead. However, the extra overhead helped close one additional difficult formula involving quantifier interaction. This supports the hypothesis that the improved strategy is more useful on harder formulae, even if it is not always faster on small inputs.
+
+\section{Discussion and Conclusion}
+
+This project implemented a first-order logic proof-search system based on backward sequent calculus. The most important lesson was that first-order proof search is harder than propositional proof search because quantifier rules can repeatedly generate new instances. The baseline solver follows Algorithm 2 directly, while the improved solver adds caching and better term selection to reduce repeated search.
+
+A limitation of this project is that the solver is still small compared with industrial theorem provers. It uses a bounded search depth and a bounded number of fresh terms, so it is not complete in practice. Some valid formulae may fail if they require more instantiations than the limit allows. Another limitation is that the parser supports a course-style formula syntax rather than full SMT-LIB or TPTP syntax.
+
+Future work could improve the solver by adding unification, better indexing of atoms, smarter branch ordering, and support for function symbols. A larger evaluation could also use public benchmark libraries such as TPTP after extending the parser.
+
+\section{Data Availability}
+
+The source code for this project is available at: \url{https://github.com/Maxbatan/fol-proof-search-3806ict}.
+
+\begin{thebibliography}{8}
+
+\bibitem{hou2021}
+Hou, Z.: \textit{Fundamentals of Logic and Computation: With Practical Automated Reasoning and Verification}. Springer, Cham (2021)
+
+\bibitem{python}
+Python Software Foundation: Python Language Reference. \url{https://www.python.org/} (accessed 2026)
+
+\bibitem{smullyan1968}
+Smullyan, R.M.: \textit{First-Order Logic}. Springer-Verlag, Berlin (1968)
+
+\bibitem{sutcliffe2017}
+Sutcliffe, G.: The TPTP Problem Library and Associated Infrastructure. \textit{Journal of Automated Reasoning} 59, 483--502 (2017)
+
+\end{thebibliography}
+
+\appendix
+\section{Generative AI Usage}
+
+Generative AI was used for planning the project structure, explaining the assignment requirements, debugging Python parser and solver code, and improving the clarity of the report plan. Example prompts included: ``What is missing from my 3806ICT Assignment 1 report?'', ``How should Algorithm 2 be implemented as a sequent-calculus proof search?'', and ``Help me structure an LNCS report for this assignment.'' The AI responses were reviewed and edited manually before use.
+
+\end{document}
