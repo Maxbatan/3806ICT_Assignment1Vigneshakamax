@@ -1,52 +1,47 @@
-# 3806ICT Assignment 1 - FOL Proof Search Project
+# 3806ICT Assignment 1 - Automated Reasoning Project
 
-This project implements a small first-order logic automated reasoning pipeline based on backward sequent-calculus proof search.
+This repository contains my work for 3806ICT Logic and Automated Reasoning Assignment 1.
 
-## Files
+The main aim of this project is to build a small automated reasoning system for first-order logic formulae. The system reads formulae from text files, converts them into an internal formula structure, and then tries to prove them using a baseline proof-search method and an improved version.
 
-- `logic.py` - term, formula and sequent data structures.
-- `parser.py` - parser for one FOL formula per line.
-- `solver.py` - baseline solver based on Algorithm 2 and improved solver.
-- `run_experiments.py` - runs both solvers on all datasets and writes CSV files.
-- `datasets/` - easy, medium and hard formula datasets.
-- `report/report.tex` - LNCS-style report draft/template to edit in Overleaf.
+## What is included
 
-## Formula syntax
+The project includes:
 
-Use one formula per line.
+- a formula and term representation for first-order logic
+- a parser for reading formulae from dataset files
+- a baseline proof-search solver based on Algorithm 2 from the course textbook
+- an improved solver with repeated-state caching and controlled quantifier handling
+- three datasets with easy, medium, and hard formulae
+- experiment results comparing the baseline and improved solvers
+- the report draft in LNCS style
 
-Connectives:
+## Project files
 
-- `~` negation
-- `&` conjunction
-- `|` disjunction
-- `->` implication
-- `forall x. F`
-- `exists x. F`
+- `logic.py`  
+  Defines the term and formula classes used by the parser and solvers.
 
-Examples:
+- `parser.py`  
+  Reads formulae from text files and converts them into formula objects.
 
-```text
-A -> A
-forall x. P(x) -> P(a)
-(forall x. (P(x) -> Q(x))) -> (P(a) -> Q(a))
-```
+- `solver.py`  
+  Contains the baseline solver and improved solver.
+
+- `run_experiments.py`  
+  Runs both solvers on all datasets and writes the results to CSV files.
+
+- `datasets/`  
+  Contains the easy, medium, and hard formula datasets.
+
+- `results/`  
+  Contains the generated experiment result files.
+
+- `report/`  
+  Contains the report draft.
 
 ## How to run
 
-Use Python 3.10+.
+From the main project folder, run:
 
 ```bash
-cd fol_solver_project
 python run_experiments.py
-```
-
-The output CSV files are written to `results/`.
-
-## For the report
-
-1. Run the experiment.
-2. Copy the generated `results/summary_results.csv` numbers into the results table in `report/report.tex`.
-3. Upload `report/report.tex` to the Springer LNCS Overleaf template.
-4. Replace the GitHub link in the Data Availability section with your own repository link.
-5. Rewrite the report wording in your own voice before submission.
