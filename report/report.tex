@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{url}
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -121,20 +122,22 @@ The experiment was run on Windows 11 using Python 3.13.2 on a laptop with a 13th
 
 Table~\ref{tab:results} gives the summary results from the experiment. The time values are total runtime for each dataset.
 
-\begin{table}[t]
-\centering
+\begin{table}
 \caption{Baseline and improved solver results.}
 \label{tab:results}
-\begin{tabular}{lrrrrrr}
-\toprule
-Dataset & Formulae & Base solved & Imp. solved & Base time & Imp. time & Base avg steps\\
-\midrule
-Easy & 10 & 8 & 8 & 0.000709 & 0.000862 & 3.8\\
-Medium & 10 & 10 & 10 & 0.003533 & 0.008616 & 13.2\\
-Hard & 10 & 9 & 10 & 0.096829 & 0.162230 & 56.1\\
-\bottomrule
+\centering
+\begin{tabular}{lrrrrrrr}
+\hline
+Dataset & Formulae & Base solved & Imp. solved & Base time & Imp. time & Base steps & Imp. steps\\
+\hline
+Easy & 10 & 8 & 8 & 0.000709 & 0.000862 & 3.8 & 3.8\\
+Medium & 10 & 10 & 10 & 0.003533 & 0.008616 & 13.2 & 13.2\\
+Hard & 10 & 9 & 10 & 0.096829 & 0.162230 & 56.1 & 93.6\\
+\hline
 \end{tabular}
 \end{table}
+The step columns show the average number of proof-search states visited by each solver for formulas in that dataset.
+
 
 The easy dataset was handled well by both solvers. This is expected because most formulae in the easy dataset require only identity closure and simple propositional decomposition. The medium dataset was also solved successfully by both solvers, although the improved solver took slightly longer because it performs extra caching and ordering checks.
 
@@ -149,26 +152,43 @@ A limitation of this project is that the solver is still small compared with ind
 Future work could improve the solver by adding unification, better indexing of atoms, smarter branch ordering, and support for function symbols. A larger evaluation could also use public benchmark libraries such as TPTP after extending the parser.
 
 \section{Data Availability}
-The source code and datasets for this project are available at:
-\url{https://github.com/Maxbatan/3806ICT_Assignment1Vigneshakamax}
+The source code and datasets for this project are available in the project GitHub repository:
+\href{https://github.com/Maxbatan/3806ICT_Assignment1Vigneshakamax}{GitHub repository for this project}.
 
 \begin{thebibliography}{8}
 
 \bibitem{hou2021}
-Hou, Z.: \textit{Fundamentals of Logic and Computation: With Practical Automated Reasoning and Verification}. Springer, Cham (2021)
-
-\bibitem{python}
-Python Software Foundation: Python Language Reference. \url{https://www.python.org/} (accessed 2026)
+Hou, Z.:
+\textit{Fundamentals of Logic and Computation: With Practical Automated Reasoning and Verification}.
+Springer, Cham (2021).
+\doi{10.1007/978-3-030-87882-5}
 
 \bibitem{smullyan1968}
-Smullyan, R.M.: \textit{First-Order Logic}. Springer-Verlag, Berlin (1968)
+Smullyan, R.M.:
+\textit{First-Order Logic}.
+Springer-Verlag, Berlin (1968).
+\doi{10.1007/978-3-642-86718-7}
+
+\bibitem{nipkow2002}
+Nipkow, T., Paulson, L.C., Wenzel, M.:
+\textit{Isabelle/HOL: A Proof Assistant for Higher-Order Logic}.
+Lecture Notes in Computer Science, vol. 2283.
+Springer, Berlin, Heidelberg (2002).
+\doi{10.1007/3-540-45949-9}
 
 \bibitem{sutcliffe2017}
-Sutcliffe, G.: The TPTP Problem Library and Associated Infrastructure. \textit{Journal of Automated Reasoning} 59, 483--502 (2017)
+Sutcliffe, G.:
+The TPTP Problem Library and Associated Infrastructure: From CNF to TH0, TPTP v6.4.0.
+\textit{Journal of Automated Reasoning} 59, 483--502 (2017).
+\doi{10.1007/s10817-017-9407-7}
+
+\bibitem{python2026}
+Python Software Foundation:
+\textit{The Python Language Reference}.
+Python Documentation (2026).
+\url{https://docs.python.org/3/reference/index.html}
 
 \end{thebibliography}
-
-\appendix
 \section{Generative AI Usage}
 
 Generative AI was used for planning the project structure, explaining the assignment requirements, debugging Python parser and solver code, and improving the clarity of the report plan. Example prompts included: ``What is missing from my 3806ICT Assignment 1 report?'', ``How should Algorithm 2 be implemented as a sequent-calculus proof search?'', and ``Help me structure an LNCS report for this assignment.'' The AI responses were reviewed and edited manually before use.
