@@ -18,25 +18,25 @@
 \maketitle
 
 \begin{abstract}
-This project investigates automated reasoning for first-order logic using a backward sequent-calculus proof-search method. The assignment goal was to implement the textbook proof-search procedure and then improve its performance on benchmark formulae. The system developed in this project reads formulae from text files, parses each formula into an abstract syntax tree, converts the target formula into an initial sequent, and then attempts to prove it using a baseline solver based on Algorithm 2 from the course textbook. The baseline solver applies sequent-calculus rules backwards, closing branches using identity and other closing rules, decomposing non-branching connectives first, and then exploring branching and quantifier rules. An improved solver was also implemented by adding repeated-state caching, deterministic rule ordering, and coordinated quantifier instantiation. These changes are designed to reduce repeated exploration and choose useful terms earlier when handling quantified formulae. The system was tested on three generated datasets: easy, medium, and hard. The results show that both solvers handled simple formulae well, while the improved solver was more useful on difficult formulae involving nested quantifiers and implication chains. The project shows that even small proof-search optimisations can improve the practical behaviour of a first-order reasoning system, although the method is still limited by depth bounds and the undecidability of first-order validity.
+This project investigates automated reasoning for first-order logic using a backward sequent calculus proof search method. The assignment goal was to implement the textbook proof search procedure and then improve its performance on benchmark formulae. The system developed in this project reads formulae from text files, parses each formula into an abstract syntax tree, converts the target formula into an initial sequent, and then attempts to prove it using a baseline solver based on Algorithm 2 from the course textbook. The baseline solver applies sequent calculus rules backwards, closing branches using identity and other closing rules, decomposing non branching connectives first, and then exploring branching and quantifier rules. An improved solver was also developed by adding repeated state caching, deterministic rule ordering, and coordinated quantifier instantiation. These changes are specially designed to reduce repeated exploration and choose useful terms earlier when handling quantified formulae. The system was tested on three generated datasets which are easy, medium, and hard. The results show that both solvers handled simple formulae good, while the improved solver was more useful on difficult formulae involving nested quantifiers and implication chains. The project shows that even small proof search optimisations can also improve the  behaviour of a first order reasoning system, although the method is still limited by the deep bounds and the inconsistency of first order validity.
 \keywords{Automated reasoning \and First-order logic \and Sequent calculus \and Proof search}
 \end{abstract}
 
 \section{Introduction}
 
-Automated reasoning studies how computers can check logical arguments and prove formulae automatically. It is important in formal verification, artificial intelligence, program analysis, and security because many correctness problems can be represented as logical proof tasks. First-order logic is especially useful because it can describe objects, predicates, and quantified statements such as ``all objects have a property'' or ``there exists an object with a property''.
+Automated reasoning studies shows how computers can check logical arguments and prove formulae automatically. It is crucial in formal verification, artificial intelligence, program analysis, and security because many true problems can be represented as logical proof tasks. First order logic is especially useful because it can describe objects, predicates, and quantified statements such as ``all objects have a property'' or ``there exists an object with a property''.
 
-The course textbook presents sequent calculus as a formal proof system for first-order logic. A sequent has the form $\Gamma \vdash \Delta$, where $\Gamma$ is the set of formulae on the left side and $\Delta$ is the set of formulae on the right side. In backward proof search, the system starts from the formula that needs to be proved and repeatedly applies inference rules backwards until all branches close or until no rule can be applied. This project implements that idea as a small automated theorem prover.
+The course textbook presents sequent calculus as a formal proof system for first order logic. A sequent has the form $\Gamma \vdash \Delta$, where $\Gamma$ is the set of formulae on the left side and $\Delta$ is the set of formulae on the right side. In backward proof search, the system starts from the formula that needs to be proved and repeatedly applies inference rules backwards until all branches close or until no rule can be applied. This project implements that idea as a small automated theorem prover.
 
-The main contribution of this project is a working proof-search pipeline for first-order logic formulae. The baseline solver follows Algorithm 2 from Hou's textbook~\cite{hou2021}. The improved solver extends the baseline with repeated-state caching and quantifier-term ordering. The implementation is tested on several generated datasets to compare how many formulae each method can prove and how much time each method takes.
+The main contribution of this project is a working proof search pipeline for first-order logic formulae. The baseline solver follows Algorithm 2 from Hou's textbook~\cite{hou2021}. The improved solver extends the baseline with repeated-state caching and quantifier-term ordering. The implementation is tested on several generated datasets to compare how many formulae each method can prove and how much time each method takes.
 
 \section{Background and Related Work}
 
-The textbook explains that proof search is the process of finding a derivation in a proof calculus. In sequent calculus, rules are applied to transform a target sequent into simpler sequents. If every branch can be closed, then the original formula is valid. The identity rule closes a branch when the same formula appears on both sides of the sequent.
+The textbook explains proof search is the process of finding a derivation in a proof calculus. In sequent calculus, rules are applied to transform a target sequent into simpler and much easier sequents. If every branch can be closed, then the original formula is valid. The identity rule closes a branch when the same formula appears on both sides of the sequent.
 
-For propositional logic, backward proof search can be systematic because each logical rule breaks a formula into smaller subformulae. First-order logic is harder because quantifier rules can generate new terms and may be applied many times. In Algorithm 2, the problematic rules are $\forall L$ and $\exists R$, because they keep the quantified formula in the premise and may therefore be applied repeatedly. This means first-order proof search is a semi-decision procedure: it can find proofs for many valid formulae, but it may not terminate for every input.
+For propositional logic, backward proof search can be systematic because each logical rule breaks a formula into smaller parts of formulae. First order logic is harder because quantifier rules can generate new terms and may be applied many times. In Algorithm 2, the problematic rules are $\forall L$ and $\exists R$, because they keep the quantified formula in the premise and may therefore be applied repeatedly. This means first-order proof search is a semi-decision procedure: it can find proofs for many valid formulae, but it may not terminate for every input.
 
-Modern theorem provers use many more advanced techniques, such as indexing, unification, resolution, tableaux, and sophisticated heuristics. This project does not wrap an existing solver. Instead, it implements the textbook-style sequent-calculus search directly and then adds small optimisations to that implementation.
+Modern theorem provers use many more advanced techniques, such as indexing, unification, resolution, tableaux, and sophisticated heuristics. This project does not wrap an existing solver. Instead, it implements the textbook-style sequent calculus search directly and then adds small optimisations to that implementation.
 
 \section{Proposed Approach}
 
@@ -70,7 +70,7 @@ Proved / not proved, runtime, and step count
 
 \subsection{Formula Representation and Parser}
 
-The implementation uses a simple abstract syntax tree for first-order logic. Terms are represented as either variables or constants. Formulae are represented using predicate atoms, truth, falsity, negation, conjunction, disjunction, implication, universal quantification, and existential quantification.
+The implementation uses a simple abstract syntax tree for first order logic. Terms are represented as either variables or constants. Formulae are represented using predicate atoms, truth, falsity, negation, conjunction, disjunction, implication, universal quantification, and existential quantification.
 
 The parser supports the syntax used in the dataset files. For example, the formula
 \begin{verbatim}
@@ -90,7 +90,7 @@ The baseline is kept simple so that it closely follows the textbook algorithm. I
 
 The improved solver keeps the same logical rules as the baseline but changes the search strategy. Three improvements were added.
 
-First, repeated-state caching records previously explored sequents together with their quantifier-instantiation history. If the same proof state is reached again, the solver avoids repeating the same search path. This is expected to reduce unnecessary recomputation.
+First, repeated state caching records previously explored sequents together with their quantifier \textbf{}instantiation history. If the same proof state is reached again, the solver avoids repeating the same search path. This is expected to reduce unnecessary recomputation.
 
 Second, deterministic rule ordering processes smaller formulae first. The hypothesis is that simple decompositions often expose atoms earlier, allowing the identity rule to close branches sooner.
 
@@ -98,9 +98,9 @@ Third, coordinated quantifier instantiation prioritises terms already appearing 
 
 \section{Datasets}
 
-Three datasets were generated for this project: easy, medium, and hard. Each dataset contains 10 formulae, giving 30 formulae in total. The formulae were designed using the first-order logic syntax and sequent-calculus proof-search ideas covered in the course textbook, but they were not copied directly from the book or from an online benchmark library.
+Three datasets were generated for this project: easy, medium, and hard. Each dataset contains 10 formulae, giving 30 formulae in total. The formulae were designed using the first-order logic syntax and sequent calculus proof-search ideas covered in the course textbook, but they were not copied directly from the book or from an online benchmark library.
 
-The easy dataset contains simple propositional formulae and single-quantifier formulae. The medium dataset contains formulae where universal or existential formulae interact with implication. The hard dataset contains nested quantifiers, longer implication chains, and branching formulae. These datasets are suitable because they test different proof-search behaviours, including identity closure, propositional branching, quantifier instantiation, and repeated reasoning across implication chains.
+The easy dataset contains simple propositional formulae and single quantifier formulae. The medium dataset contains formulae where universal or existential formulae interact with implication. The hard dataset contains nested quantifiers, longer implication chains, and branching formulae. These datasets are suitable because they test different proof-search behaviours, including identity closure, propositional branching, quantifier instantiation, and repeated reasoning across implication chains.
 
 The datasets also include formulae with different levels of difficulty. This helps test both normal successful proof search and cases where the search space becomes larger because of branching or quantifier instantiation.
 
@@ -145,9 +145,9 @@ The hard dataset shows the main benefit of the improved method. The baseline sol
 
 \section{Discussion and Conclusion}
 
-This project implemented a first-order logic proof-search system based on backward sequent calculus. The most important lesson was that first-order proof search is harder than propositional proof search because quantifier rules can repeatedly generate new instances. The baseline solver follows Algorithm 2 directly, while the improved solver adds caching and better term selection to reduce repeated search.
+This project implemented a first-order logic proof-search system based on backward sequent calculus. The most important lesson was that first order proof search is harder than propositional proof search because quantifier rules can repeatedly generate new instances. The baseline solver follows Algorithm 2 directly, while the improved solver adds caching and better term selection to reduce repeated search.
 
-A limitation of this project is that the solver is still small compared with industrial theorem provers. It uses a bounded search depth and a bounded number of fresh terms, so it is not complete in practice. Some valid formulae may fail if they require more instantiations than the limit allows. Another limitation is that the parser supports a course-style formula syntax rather than full SMT-LIB or TPTP syntax.
+A limitation of this project is that the solver is still small compared with industrial theorem provers. It uses a bounded search depth and a bounded number of fresh terms, so it is not complete in practice. Some valid formulae may fail if they require more instantiations than the limit allows. Another limitation is that the parser supports a course style formula syntax rather than full SMT-LIB or TPTP syntax.
 
 Future work could improve the solver by adding unification, better indexing of atoms, smarter branch ordering, and support for function symbols. A larger evaluation could also use public benchmark libraries such as TPTP after extending the parser.
 
@@ -191,6 +191,6 @@ Python Documentation (2026).
 \end{thebibliography}
 \section{Generative AI Usage}
 
-Generative AI was used for planning the project structure, explaining the assignment requirements, debugging Python parser and solver code, and improving the clarity of the report plan. Example prompts included: ``What is missing from my 3806ICT Assignment 1 report?'', ``How should Algorithm 2 be implemented as a sequent-calculus proof search?'', and ``Help me structure an LNCS report for this assignment.'' The AI responses were reviewed and edited manually before use.
+Generative AI was used for planning the project structure, explaining the assignment requirements, debugging Python parser and solver code, and improving the clarity of the report plan. Example prompts included: ``What is missing from my 3806ICT Assignment 1 report?'', ``How should Algorithm 2 be implemented as a sequent calculus proof search?'', and ``Help me structure an LNCS report for this assignment.'' The AI responses were reviewed and edited manually before use.
 
 \end{document}
