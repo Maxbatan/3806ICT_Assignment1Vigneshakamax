@@ -83,7 +83,7 @@ The baseline solver follows the structure of Algorithm 2. To prove a formula $A$
 
 If the branch is not closed, the solver applies non-branching rules first. These include rules such as $\land L$, $\lor R$, $\rightarrow R$, $\neg L$, $\neg R$, $\forall R$, and $\exists L$. After that, it applies branching rules such as $\land R$, $\lor L$, and $\rightarrow L$. Finally, the solver applies the copying quantifier rules $\forall L$ and $\exists R$. When an existing term is available and has not yet been used for that quantified formula, the solver instantiates the quantified variable using that term. If no such term exists, the solver creates a fresh constant.
 
-The baseline is intentionally naive. It follows the rule order from the textbook and uses only a fixed search depth and step limit to avoid infinite search.
+The baseline is kept simple so that it closely follows the textbook algorithm. It follows the rule order from the textbook and uses a fixed search depth and step limit to avoid infinite search.
 
 \subsection{Improved Solver}
 
@@ -97,9 +97,11 @@ Third, coordinated quantifier instantiation prioritises terms already appearing 
 
 \section{Datasets}
 
-Three generated datasets were used. The easy dataset contains simple propositional formulae and single-quantifier formulae. The medium dataset contains formulae where universal or existential formulae must interact with implication. The hard dataset contains nested quantifiers, longer implication chains, and branching formulae. The datasets are suitable because they test different proof-search behaviours: simple identity closure, propositional branching, quantifier instantiation, and repeated reasoning across implication chains.
+Three datasets were generated for this project: easy, medium, and hard. Each dataset contains 10 formulae, giving 30 formulae in total. The formulae were designed using the first-order logic syntax and sequent-calculus proof-search ideas covered in the course textbook, but they were not copied directly from the book or from an online benchmark library.
 
-Some formulae are intentionally not provable by the solver or are difficult under the search limits. This is useful because it tests not only whether the solver can close easy branches, but also how it behaves when the proof search space becomes larger.
+The easy dataset contains simple propositional formulae and single-quantifier formulae. The medium dataset contains formulae where universal or existential formulae interact with implication. The hard dataset contains nested quantifiers, longer implication chains, and branching formulae. These datasets are suitable because they test different proof-search behaviours, including identity closure, propositional branching, quantifier instantiation, and repeated reasoning across implication chains.
+
+The datasets also include formulae with different levels of difficulty. This helps test both normal successful proof search and cases where the search space becomes larger because of branching or quantifier instantiation.
 
 \section{Implementation and Experiment}
 
